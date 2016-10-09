@@ -7,7 +7,7 @@ import java.net.URL;
 /**
  * Created by linkang on 10/9/16.
  */
-public class Demo1 {
+public class UrlDemo1 {
     public static void main(String[] args) {
         try {
             URL url = new URL("https://pic2.zhimg.com/230337f78bd95dbc6cfdf91bc4048f3d_b.jpg");
