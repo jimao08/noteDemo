@@ -22,7 +22,7 @@ public class Demo1 {
                 fileOutputStream.write(buffer, 0, tmp);
             }
             fileOutputStream.close();
-
+            System.out.println("hehe");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
