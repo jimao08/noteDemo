@@ -17,6 +17,7 @@ public class SocketDemo1 {
             SocketAddress sa = new InetSocketAddress("localhost",9000);
             socket.connect(sa);
             System.out.println(socket.getInetAddress().getHostAddress());
+            System.out.println(socket.getLocalAddress().getHostAddress());
 
             String input = new Scanner(System.in).next();
 
