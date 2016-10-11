@@ -1,4 +1,4 @@
-package com.demo.DemoUtils;
+package com.demo.IoDemo;
 
 import java.io.*;
 
@@ -6,7 +6,7 @@ import java.io.*;
  * io流demo
  * Created by linkang on 10/9/16.
  */
-public class Demo1 {
+public class ObjectIoDemo {
     public static void main(String[] args) {
 
         mmm();
