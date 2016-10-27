@@ -6,12 +6,15 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by linkang on 10/10/16.
  */
 public class ServerSocketDemo1 {
     public static void main(String[] args) {
+        ExecutorService executorService = Executors.newCachedThreadPool();
         ServerSocket serverSocket = null;
         try {
              serverSocket = new ServerSocket(9000);
@@ -26,8 +29,7 @@ public class ServerSocketDemo1 {
                 InetAddress inetAddress = socket.getInetAddress();
                 System.out.println("host add=" + inetAddress.getHostAddress());
 
-
-                new Thread(new SocketTask(socket,num++)).start();
+                executorService.execute(new SocketTask(socket,num++));
             }
 
         } catch (IOException e) {
