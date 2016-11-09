@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>this is Title</title>
+    <script src="http://libs.baidu.com/jquery/1.8.3/jquery.min.js"></script>
+</head>
+<body>
+<script>
+    //    function myFunction() {
+    //        var str = "";
+    //        var person = {name: "hah", age: 20};
+    //        var sum = 0;
+    //        var array = new Array();
+    //        for (var i = 1 ; i < 101; i++) {
+    //            sum += i;
+    //            array[i] = i;
+    //        }
+    //        document.getElementById("demo").innerHTML = "hahah" + sum + array[99] + person.name;
+    //    }
+
+    function myFunction() {
+        var tmp = location.href;
+        $("#demo").html("hello w<br>" + tmp).attr("style","color:red");
+//        window.location.assign("http://www.baidu.com");
+
+    }
+    $(document).ready(myFunction);
+
+</script>
+
+<p id="demo"/>
+<br/>
+<!--<button id="btn" onclick="myFunction()">click</button>-->
+
+</body>
+</html>
