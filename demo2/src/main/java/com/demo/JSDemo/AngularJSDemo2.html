@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="http://cdn.static.runoob.com/libs/angular.js/1.4.6/angular.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="mycss.css">
+</head>
+<body>
+
+<div ng-app="" ng-init="person={fname:'jjj',lname:'bbb'};price=0;acount=0;names=[1,2,3,4]">
+    <p>
+        单价：<input type="number" ng-model="price"><br/>
+        数量: <input type="number" ng-model="acount"/><br/>
+    </p>
+    <h1>{{price*acount}}</h1>
+
+    <ul>
+        <li ng-repeat="x in names">
+            {{x}}
+        </li>
+
+    </ul>
+
+    <p>{{person}}</p>
+</div>
+
+</body>
+</html>

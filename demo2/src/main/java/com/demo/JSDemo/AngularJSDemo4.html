@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="http://cdn.static.runoob.com/libs/angular.js/1.4.6/angular.min.js"></script>
+</head>
+<body>
+
+<div ng-app="myApp" ng-controller="siteCtrl">
+
+    <!--<ul>-->
+        <!--<li ng-repeat="x in data">-->
+            <!--{{ x}}-->
+        <!--</li>-->
+    <!--</ul>-->
+    <p>{{data}}</p>
+
+</div>
+
+<script>
+    var app = angular.module('myApp', []);
+    app.controller('siteCtrl', function ($scope, $http) {
+        $http({
+            method: "GET",
+            url: "http://ns.huatu.com/a/system/health",
+            headers: {
+                "cv": "2.4",
+                "terminal": "1"
+            },
+        }).success(function (response) {
+            $scope.data = response.data;
+            var tmp = response.data;
+
+            console.log("hah" + tmp);
+        })
+    });
+</script>
+
+</body>
+</html>
