@@ -1,14 +1,13 @@
 package com.demo.ThreadDemo;
 
-import org.junit.Test;
-
-import java.util.concurrent.atomic.AtomicInteger;
+import com.demo.AnnotationDemo.MyAnnotation;
 
 /**
- *
  * 测试AtomicInteger
  * Created by linkang on 17-6-7.
  */
+
+@MyAnnotation(sval = "abcdef")
 public class ThreadDemo1 {
     public static int total;
     public static Object obj = new Integer(123);
@@ -50,6 +49,16 @@ public class ThreadDemo1 {
 //                    System.out.println(Thread.currentThread().getName() + ":" + test.total.incrementAndGet());;
             }
         }
+    }
+
+    private void method1() {
+        System.out.println("hello");
+    }
+
+    @MyAnnotation(sval = "hahah", ival = 123)
+    public void method2(int ival) {
+
+        System.out.println("print=" + ival);
     }
 }
 
