@@ -40,14 +40,22 @@ public class AnnotationDemo1 {
             System.out.println(annotation1.sval());
         }
 
-        Method method1 = demo1Class.getDeclaredMethod("method1");
-        method1.setAccessible(true);
-        method1.invoke(threadDemo1);
 
-        for (Annotation annotation : demo1Class.getAnnotations()) {
+
+        Method m2 = demo1Class.getDeclaredMethod("method2", int.class);
+        m2.setAccessible(true);
+        m2.invoke(threadDemo1,1);
+
+        for (Annotation annotation : m2.getAnnotations()) {
             if (annotation instanceof MyAnnotation) {
                 String value = ((MyAnnotation) annotation).sval();
                 System.out.println(">>>>" + value);
+
+                MyTestType[] types = ((MyAnnotation) annotation).type();
+
+                for (MyTestType type : types) {
+                    System.out.println(type);
+                }
             }
         }
     }

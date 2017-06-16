@@ -1,6 +1,7 @@
 package com.demo.ThreadDemo;
 
 import com.demo.AnnotationDemo.MyAnnotation;
+import com.demo.AnnotationDemo.MyTestType;
 
 /**
  * 测试AtomicInteger
@@ -55,10 +56,10 @@ public class ThreadDemo1 {
         System.out.println("hello");
     }
 
-    @MyAnnotation(sval = "hahah", ival = 123)
-    public void method2(int ival) {
+    @MyAnnotation(sval = "hahah", ival = 123, type = MyTestType.TEST1)
+    public void method2(int value) {
 
-        System.out.println("print=" + ival);
+        System.out.println("print=" + value);
     }
 }
 
