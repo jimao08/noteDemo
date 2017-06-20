@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * Created by linkang on 17-6-16.
  */
-public class dddd2 {
+public class FindDemo {
 
 
     public static void main(String[] args) {
