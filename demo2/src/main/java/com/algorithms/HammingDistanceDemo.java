@@ -10,9 +10,24 @@ public class HammingDistanceDemo {
         Integer val1 = 137;
         Integer val2 = 177;
 
-        String s1 = Integer.toBinaryString(val1);
-        String s2 = Integer.toBinaryString(val2);
 
+        System.out.println(getDifferenceCountByBit(val1,val2));
+
+    }
+
+
+    /**
+     *
+     * 试验
+     * 数字转为字符串
+     *
+     * @param ival1
+     * @param ival2
+     * @return
+     */
+    public static int getDifferenceCountByString(int ival1,int ival2) {
+        String s1 = Integer.toBinaryString(ival1);
+        String s2 = Integer.toBinaryString(ival2);
 
         System.out.println(s1);
         System.out.println(s2);
@@ -23,6 +38,20 @@ public class HammingDistanceDemo {
                 count++;
             }
         }
-        System.out.println(count);
+
+        return count;
+    }
+
+    /**
+     *
+     * 进行异或运算，统计结果为1的个数
+     *
+     * @param ival1
+     * @param ival2
+     * @return
+     */
+    public static int getDifferenceCountByBit(int ival1,int ival2) {
+
+        return Integer.bitCount(ival1 ^ ival2);
     }
 }
