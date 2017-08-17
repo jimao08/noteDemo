@@ -22,4 +22,9 @@ public class MyController {
         map.put("msg", "ss");
         return map;
     }
+
+    @RequestMapping(value = "")
+    public void dd() {
+
+    }
 }
