@@ -5,9 +5,9 @@ import com.demo.TestServer.WebServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MyService {
+public class MyServer {
 
-    private static final Logger logger = LoggerFactory.getLogger(MyService.class);
+    private static final Logger logger = LoggerFactory.getLogger(MyServer.class);
 
     public static void main(String[] args) throws Exception {
         String serverAddress = "localhost";//server地址

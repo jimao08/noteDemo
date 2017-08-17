@@ -128,7 +128,7 @@ public class WebServer {
 //        if (!webappDir.exists()) {
 //            throw new IllegalArgumentException("webapp dir not exist. dir="+webappPath);
 //        }
-        return "/home/linkang/tools/workspace/comdemo2/src/main/webapp";
+        return "C:\\Users\\Administrator\\workspace\\noteDemo\\demo2\\src\\main/webapp";
     }
 
     public int getMinThreads() {
