@@ -15,11 +15,7 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 简易的内嵌jetty的web服务
- * 这个服务基于传统的webapp
- * Created by shaojieyue on 4/11/16.
- */
+
 public class WebServer {
     private static final Logger logger = Log.getLogger(WebServer.class);
     /**
@@ -128,7 +124,7 @@ public class WebServer {
 //        if (!webappDir.exists()) {
 //            throw new IllegalArgumentException("webapp dir not exist. dir="+webappPath);
 //        }
-        return "C:\\Users\\Administrator\\workspace\\noteDemo\\demo2\\src\\main/webapp";
+        return WebappPathUtil.getPath();
     }
 
     public int getMinThreads() {

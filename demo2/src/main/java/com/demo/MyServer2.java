@@ -1,5 +1,6 @@
 package com.demo;
 
+import com.demo.TestServer.WebappPathUtil;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
@@ -17,7 +18,7 @@ public class MyServer2 {
     public static void main(String[] args) throws Exception{
 
         String contentPath = "/a";
-        String webappDir = "C:\\Users\\Administrator\\workspace\\noteDemo\\demo2\\src\\main/webapp";
+        String webappDir = WebappPathUtil.getPath();
 
         final InetSocketAddress inetSocketAddress = new InetSocketAddress("localhost", 8080);
         final Server server = new Server(inetSocketAddress);
