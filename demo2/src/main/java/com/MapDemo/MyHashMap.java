@@ -1,5 +1,6 @@
-package com.demo;
+package com.MapDemo;
 
+import com.demo.MyServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
