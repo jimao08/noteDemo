@@ -1,4 +1,4 @@
-package com.MapDemo;
+package com.demo.MapDemo;
 
 public class MyHashMapDemo {
 

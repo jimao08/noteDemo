@@ -1,4 +1,4 @@
-package com.MapDemo;
+package com.demo.MapDemo;
 
 import com.demo.MyServer;
 import org.slf4j.Logger;
