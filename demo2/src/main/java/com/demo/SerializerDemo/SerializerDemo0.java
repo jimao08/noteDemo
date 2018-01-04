@@ -24,5 +24,8 @@ public class SerializerDemo0 {
 
         System.out.println(read);
 
+
+
+
     }
 }
