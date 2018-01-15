@@ -70,4 +70,40 @@ public class SerializerOjbect implements Serializable{
         in.defaultReadObject();
     }
 
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public int getIval() {
+        return ival;
+    }
+
+    public void setIval(int ival) {
+        this.ival = ival;
+    }
+
+    public List<String> getList() {
+        return list;
+    }
+
+    public void setList(List<String> list) {
+        this.list = list;
+    }
+
+    public double getDval() {
+        return dval;
+    }
+
+    public void setDval(double dval) {
+        this.dval = dval;
+    }
+
+    public CondType getCondType() {
+        return condType;
+    }
+
+    public void setCondType(CondType condType) {
+        this.condType = condType;
+    }
 }
