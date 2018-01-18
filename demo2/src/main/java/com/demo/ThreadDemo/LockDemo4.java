@@ -11,7 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * synchronized monitor demo
  */
 public class LockDemo4 {
-    private static int money = 1000;
+    private static int money = 0;
     private static Object lock = new Object();
     private static Object noMoney = new Object();
 
@@ -29,7 +29,7 @@ public class LockDemo4 {
 
         List<Thread> getThreads = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
-            Thread thread = new Thread(new GetTask(113));
+            Thread thread = new Thread(new GetTask(40));
             thread.setName("get thread" + i);
             threads.add(thread);
             getThreads.add(thread);
@@ -74,7 +74,7 @@ public class LockDemo4 {
             synchronized (lock) {
 
                 try {
-                    while (money - getNum < 0) {
+                    if (money - getNum < 0) {
                         lock.wait();
                         System.out.println(Thread.currentThread() + " wait save money.current=" + money);
                     }
@@ -82,6 +82,11 @@ public class LockDemo4 {
                     money = money - getNum;
                     System.out.println("get money:" + getNum + ",current=" + money);
                     System.out.println(Thread.currentThread() + " unlock.");
+
+                    if (money > 0) {
+                        lock.notify();
+                    }
+
                 } catch (Exception e) {
                     System.out.println(Thread.currentThread() + " interrupt.");
                     e.printStackTrace();
