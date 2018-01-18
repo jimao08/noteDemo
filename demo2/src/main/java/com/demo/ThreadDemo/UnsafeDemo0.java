@@ -22,5 +22,7 @@ public class UnsafeDemo0 {
         UnsafeDemo0 demo0 = new UnsafeDemo0();
         unsafe.compareAndSwapInt(demo0, offset, 0, -1200);
         System.out.println(demo0.ival);
+
+        System.out.println(unsafe.getInt(demo0,offset));
     }
 }
