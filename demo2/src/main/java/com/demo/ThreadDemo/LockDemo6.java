@@ -51,7 +51,7 @@ public class LockDemo6 {
     }
 
 
-    static class MinusTask implements Runnable {
+    private static class MinusTask implements Runnable {
 
         private final int minusNum;
 
