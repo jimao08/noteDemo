@@ -6,6 +6,10 @@ import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+
+/**
+ * reentrantlock demo
+ */
 public class LockDemo3 {
     private static int money = 1000;
     private static ReentrantLock lock = new ReentrantLock();

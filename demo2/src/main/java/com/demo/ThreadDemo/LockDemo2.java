@@ -5,6 +5,10 @@ import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+
+/**
+ * ReentrantReadWriteLock demo
+ */
 public class LockDemo2 {
 
     private static ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();

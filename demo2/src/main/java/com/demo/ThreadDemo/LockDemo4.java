@@ -7,6 +7,9 @@ import java.util.Random;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * synchronized monitor demo
+ */
 public class LockDemo4 {
     private static int money = 1000;
     private static Object lock = new Object();

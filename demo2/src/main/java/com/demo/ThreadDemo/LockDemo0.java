@@ -5,6 +5,10 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+
+/**
+ * ReentrantLock demo
+ */
 public class LockDemo0 {
 
     private static ReentrantLock lock = new ReentrantLock();
