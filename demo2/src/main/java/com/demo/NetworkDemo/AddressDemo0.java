@@ -8,7 +8,7 @@ import java.util.HashMap;
  * adress demo
  * Created by linkang on 10/9/16.
  */
-public class AddDemo0 {
+public class AddressDemo0 {
 
     public static void main(String[] args) {
         try {

@@ -14,7 +14,6 @@ public class LockDemo2 {
     private static ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
     public static void main(String[] args) throws Exception {
-
         LockDemo2 demo2 = new LockDemo2();
 
         for (int i = 0; i < 100; i++) {

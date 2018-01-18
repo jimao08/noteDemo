@@ -27,7 +27,7 @@ public class LockDemo5 {
         }
     }
 
-    static class AddTask implements Runnable {
+    private static class AddTask implements Runnable {
 
         private final int addNum;
 
@@ -54,7 +54,7 @@ public class LockDemo5 {
     }
 
 
-    static class MinusTask implements Runnable {
+    private static class MinusTask implements Runnable {
 
         private final int minusNum;
 
@@ -82,7 +82,7 @@ public class LockDemo5 {
     }
 
 
-    static class LookTask implements Runnable {
+    private static class LookTask implements Runnable {
 
         public LookTask() {
         }

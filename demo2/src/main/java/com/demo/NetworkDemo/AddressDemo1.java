@@ -7,7 +7,7 @@ import java.net.UnknownHostException;
  * 测试socket address
  * Created by linkang on 10/10/16.
  */
-public class AddDemo1 {
+public class AddressDemo1 {
     public static void main(String[] args) {
         try {
             InetAddress inetAddress = InetAddress.getLocalHost();
