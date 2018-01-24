@@ -74,7 +74,7 @@ public class LockDemo4 {
             synchronized (lock) {
 
                 try {
-                    if (money - getNum < 0) {
+                    while (money - getNum < 0) {
                         lock.wait();
                         System.out.println(Thread.currentThread() + " wait save money.current=" + money);
                     }
