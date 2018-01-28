@@ -18,6 +18,7 @@ public class ThreadDemo9 {
         service = new ThreadPoolExecutor(1, 10, 30, TimeUnit.SECONDS,
                 queue, new MyThreadFactory(), new MyPolicy());
 
+//        ((ThreadPoolExecutor) service).allowCoreThreadTimeOut(true);
 
         for (int i = 0; i < 100; i++) {
             try {

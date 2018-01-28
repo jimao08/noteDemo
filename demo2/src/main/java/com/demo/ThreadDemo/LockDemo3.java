@@ -78,6 +78,7 @@ public class LockDemo3 {
             try {
                 lock.lockInterruptibly();
 
+                System.out.println("pre.");
 //                int current = money;
                 //if (money - getNum < 0)只检查一次,while是wait结束后再检查一次条件
                 while (money - getNum < 0) {
