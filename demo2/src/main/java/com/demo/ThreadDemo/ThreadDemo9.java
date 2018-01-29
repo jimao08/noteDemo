@@ -10,22 +10,28 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ThreadDemo9 {
 
+
     private static MyQueue queue = new MyQueue(2);
     private static ExecutorService service;
+    private static AtomicInteger doneCount = new AtomicInteger();
 
     public static void main(String[] args) throws Exception {
 
-        service = new ThreadPoolExecutor(1, 10, 30, TimeUnit.SECONDS,
+        service = new ThreadPoolExecutor(1, 1, 30, TimeUnit.SECONDS,
                 queue, new MyThreadFactory(), new MyPolicy());
 
 //        ((ThreadPoolExecutor) service).allowCoreThreadTimeOut(true);
+
+        ((ThreadPoolExecutor) service).allowCoreThreadTimeOut(true);
+
 
         for (int i = 0; i < 100; i++) {
             try {
                 service.submit(new Runnable() {
                     @Override
                     public void run() {
-                        System.out.println(Thread.currentThread() + " hello world");
+                        final int done = doneCount.incrementAndGet();
+                        System.out.println(Thread.currentThread() + " hello world" + done);
 
                         try {
                             Thread.sleep(1000);
@@ -33,7 +39,7 @@ public class ThreadDemo9 {
                             e.printStackTrace();
                         }
 
-                        System.out.println(Thread.currentThread() + " done.");
+                        System.out.println(Thread.currentThread() + " done" + done);
                     }
                 });
 
@@ -44,6 +50,8 @@ public class ThreadDemo9 {
 
 
         }
+
+//        service.shutdown();
 
 
         Thread thread2 = new Thread(new Runnable() {
