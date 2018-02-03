@@ -13,23 +13,23 @@ public class NioServer {
     private static Thread s;
 
     public static void main(String[] args) throws Exception{
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                int ival = 1;
-                while (true) {
-                    ival++;
-                    Thread.yield();
-                }
-            }
-        }).start();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                int ival = 1;
+//                while (true) {
+//                    ival++;
+//                    Thread.yield();
+//                }
+//            }
+//        }).start();
 
         s = Thread.currentThread();
 
         ServerSocket serverSocket = new ServerSocket(8889);
 
         while (!shutdown) {
-            System.out.println("wait.");
+            System.out.println("wait." + shutdown);
             Socket accept = serverSocket.accept();
 
             new Thread(new Runnable() {
@@ -38,36 +38,49 @@ public class NioServer {
                     try {
                         SocketChannel channel = accept.getChannel();
 
-//                        InputStream inputStream = accept.getInputStream();
-//
-//                        InputStreamReader reader = new InputStreamReader(inputStream);
-//
-//                        BufferedReader reader1 = new BufferedReader(reader);
-//
-//
-//                        String line = reader1.readLine();
-//
-//                        if (line.equals("shutdown")) {
-//                            shutdown = true;
-//                        }
-//                        System.out.println(line);
-//
-//                        reader.close();
+                        InputStream inputStream = accept.getInputStream();
 
-                        ByteBuffer bf = ByteBuffer.allocate(40);
+                        InputStreamReader reader = new InputStreamReader(inputStream);
 
-                        if (channel == null) {
-                            System.out.println("null channel.");
-                        }
+                        BufferedReader reader1 = new BufferedReader(reader);
 
-                        while (channel.read(bf) != -1) {
-                            bf.flip();
 
-                            while (bf.hasRemaining()) {
-                                System.out.print(bf.get());
+                        String line;
+
+                        while (!shutdown) {
+                            line = reader1.readLine();
+                            if (line == null) {
+                                break;
                             }
-                            bf.compact();
+                            System.out.println(line);
+
+
+                            if (line != null && line.equals("shutdown")) {
+                                shutdown = true;
+                            }
+
+                            if (line != null && line.equals("quit")) {
+                                break;
+                            }
                         }
+
+
+                        reader.close();
+
+//                        ByteBuffer bf = ByteBuffer.allocate(40);
+//
+//                        if (channel == null) {
+//                            System.out.println("null channel.");
+//                        }
+//
+//                        while (channel.read(bf) != -1) {
+//                            bf.flip();
+//
+//                            while (bf.hasRemaining()) {
+//                                System.out.print(bf.get());
+//                            }
+//                            bf.compact();
+//                        }
 
                         accept.close();
                     } catch (Exception ex) {
