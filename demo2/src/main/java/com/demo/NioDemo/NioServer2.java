@@ -3,10 +3,7 @@ package com.demo.NioDemo;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -14,8 +11,7 @@ public class NioServer2 {
     private static volatile boolean shutdown = false;
 
 
-
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
 
         Selector selector = Selector.open();
         ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
@@ -23,7 +19,6 @@ public class NioServer2 {
         serverSocketChannel.bind(new InetSocketAddress(8889));
         serverSocketChannel.configureBlocking(false);
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
-
 
         while (true) {
             int select = selector.select();
@@ -39,17 +34,14 @@ public class NioServer2 {
                 if (key.isAcceptable()) {
                     System.out.println("accept");
                     handleAccept(key);
-                }
-
-                if (key.isReadable()) {
+                } else if (key.isReadable()) {
                     System.out.println("readable");
-                }
-
-                if (key.isWritable() && key.isValid()) {
+                    handleRead(key);
+                } else if (key.isValid() && key.isWritable()) {
                     System.out.println("writable");
-                }
+                    handleWrite(key);
 
-                if (key.isConnectable()) {
+                } else if (key.isConnectable()) {
                     System.out.println("isConnectable");
                 }
 
@@ -68,5 +60,39 @@ public class NioServer2 {
     }
 
 
+    public static void handleRead(SelectionKey key) throws IOException {
 
+
+        SocketChannel socketChannel = (SocketChannel) key.channel();
+        ByteBuffer buffer = (ByteBuffer) key.attachment();
+
+        int read = socketChannel.read(buffer);
+
+        while (read > 0) {
+            buffer.flip();
+
+            while (buffer.hasRemaining()) {
+                System.out.print((char) buffer.get());
+            }
+
+            buffer.clear();
+            read = socketChannel.read(buffer);
+        }
+
+        socketChannel.register(key.selector(), SelectionKey.OP_WRITE, ByteBuffer.allocate(64));
+    }
+
+    public static void handleWrite(SelectionKey key) throws IOException {
+        ByteBuffer bf = (ByteBuffer) key.attachment();
+
+        SocketChannel channel = (SocketChannel) key.channel();
+
+        bf.put("server".getBytes());
+        bf.flip();
+        channel.write(bf);
+        bf.compact();
+
+
+        channel.close();
+    }
 }
