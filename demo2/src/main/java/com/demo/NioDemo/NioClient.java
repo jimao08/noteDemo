@@ -3,27 +3,55 @@ package com.demo.NioDemo;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.concurrent.*;
 
 public class NioClient {
 
     public static void main(String[] args) throws Exception {
-        Socket socket = new Socket("localhost", 8889);
-        OutputStream os = socket.getOutputStream();
 
-        os.write("hehe".getBytes());
+        ExecutorService service = new ThreadPoolExecutor(10, 20, 2,
+                TimeUnit.MINUTES, new LinkedBlockingQueue<>(), Executors.defaultThreadFactory(), new ThreadPoolExecutor.DiscardOldestPolicy());
 
-        os.flush();
+        for (int i = 0; i < 1000; i++) {
 
-        InputStream inputStream = socket.getInputStream();
+            final int ival = i;
 
-        byte[] bytes = new byte[48];
-        int read ;
-        while ((read = inputStream.read(bytes))!= - 1) {
+            service.submit(new Runnable() {
+                @Override
+                public void run() {
+                    try {
 
-            System.out.println(new String(bytes, 0, read));
+                        Socket socket = new Socket("localhost", 8889);
+                        OutputStream os = socket.getOutputStream();
+
+//                        os.write(("hehe" + ival + "\n").getBytes());
+                        os.write(("set " + "hehe" + ival + " " + "d" + "\n").getBytes());
+                        os.write("quit\n".getBytes());
+
+                        os.flush();
+
+                        socket.close();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            });
+        }
+
+        service.shutdown();
+        while (!service.isTerminated()) {
+            Thread.yield();
         }
 
 
-        socket.close();
+//        InputStream inputStream = socket.getInputStream();
+//
+//        byte[] bytes = new byte[48];
+//        int read ;
+//        while ((read = inputStream.read(bytes))!= - 1) {
+//
+//            System.out.println(new String(bytes, 0, read));
+//        }
+
     }
 }

@@ -12,24 +12,44 @@ public class NioClient2 {
 //        Socket socket = new Socket("localhost", 8889);
 
 
-        SocketChannel sc = SocketChannel.open();
-        sc.configureBlocking(false);
+        for (int i = 0; i < 10; i++) {
+            final int ival = i;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+
+                        SocketChannel sc = SocketChannel.open();
+                        sc.configureBlocking(false);
 
 
-        sc.connect(new InetSocketAddress("localhost", 8889));
+                        sc.connect(new InetSocketAddress("localhost", 8889));
 
-        ByteBuffer bf = ByteBuffer.allocate(64);
-        if (sc.finishConnect()) {
-            bf.clear();
-            bf.put("hello world".getBytes());
-            bf.flip();
+                        ByteBuffer bf = ByteBuffer.allocate(64);
 
-            while (bf.hasRemaining()) {
-                sc.write(bf);
-            }
+
+//                        while (!sc.finishConnect()) {
+//                            Thread.yield();
+//                        }
+
+                        if (sc.finishConnect()) {
+                            bf.clear();
+                            bf.put(("hello world" + ival).getBytes());
+                            bf.flip();
+
+                            while (bf.hasRemaining()) {
+                                sc.write(bf);
+                            }
+                        }
+                        System.out.println("finish " + ival + ">" + sc.isConnected());
+
+                        sc.close();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }).start();
         }
-
-        sc.close();
 
     }
 }

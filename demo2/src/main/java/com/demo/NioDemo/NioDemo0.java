@@ -10,25 +10,42 @@ public class NioDemo0 {
     public static void main(String[] args) throws Exception {
         File file = new File("test01");
 
-        FileInputStream fileInputStream = new FileInputStream(file);
-        FileChannel channel = fileInputStream.getChannel();
+//        FileInputStream fileInputStream = new FileInputStream(file);
+//        FileChannel channel = fileInputStream.getChannel();
+//
+//
+//        ByteBuffer bf = ByteBuffer.allocate(64);
+//
+//
+//        int read = 0;
+//        while ((read = channel.read(bf)) != -1) {
+//            bf.flip();
+//
+//            while (bf.hasRemaining()) {
+//                System.out.print((char) bf.get());
+//            }
+//
+//            bf.compact();
+//
+//            System.out.println(bf.remaining());
+//        }
 
+
+        FileOutputStream fos = new FileOutputStream(file, true);
+        FileChannel channel = fos.getChannel();
 
         ByteBuffer bf = ByteBuffer.allocate(64);
+        bf.put("hello world".getBytes());
 
-
-        int read = 0;
-        while ((read = channel.read(bf)) != -1) {
-            bf.flip();
-
-            while (bf.hasRemaining()) {
-                System.out.print((char) bf.get());
-            }
-
-            bf.compact();
-
-            System.out.println(bf.remaining());
+        bf.flip();
+        while (bf.hasRemaining()) {
+            channel.write(bf);
         }
+
+        channel.close();
+        fos.flush();
+        fos.close();
+
 
 
     }

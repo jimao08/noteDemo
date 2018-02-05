@@ -29,7 +29,7 @@ public class NioServer {
         ServerSocket serverSocket = new ServerSocket(8889);
 
         while (!shutdown) {
-            System.out.println("wait." + shutdown);
+//            System.out.println("wait." + shutdown);
             Socket accept = serverSocket.accept();
 
             new Thread(new Runnable() {
