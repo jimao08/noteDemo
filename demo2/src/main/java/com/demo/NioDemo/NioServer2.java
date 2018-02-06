@@ -4,6 +4,7 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class NioServer2 {
     private static volatile boolean shutdown = false;
@@ -12,7 +13,6 @@ public class NioServer2 {
 
 
     public static void main(String[] args) throws Exception {
-        System.out.println("nio server start.");
         Selector selector = Selector.open();
 
         ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
@@ -20,11 +20,11 @@ public class NioServer2 {
         SelectionKey key = serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT, null);
 
         serverSocketChannel.bind(new InetSocketAddress(8889));
+        System.out.println("nio server start.");
 
         while (true) {
 
             int select = selector.select();
-//            System.out.println("select=" + select);
 
             Set<SelectionKey> selectionKeys = selector.selectedKeys();
 
@@ -34,37 +34,38 @@ public class NioServer2 {
                 SelectionKey next = iterator.next();
 
                 if (next.isAcceptable()) {
-//                    System.out.println("isAcceptable");
                     SocketChannel accept = serverSocketChannel.accept();
                     accept.configureBlocking(false);
-//                    accept.register(selector, SelectionKey.OP_CONNECT, ByteBuffer.allocate(40));
                     accept.register(selector, SelectionKey.OP_READ, ByteBuffer.allocate(40));
                 } else if (next.isReadable()) {
                     SocketChannel channel = (SocketChannel) next.channel();
                     ByteBuffer buffer = (ByteBuffer) next.attachment();
 
                     int read = channel.read(buffer);
-
                     int last = buffer.position() - 1;
-//                    if (last < 0) {
-//                        continue;
-//                    }
+                    if (read == -1 || last < 0) {
 
-
+                        if (channel.isOpen()) {
+                            System.out.println(channel.getRemoteAddress() + ":close");
+                            channel.close();
+                        }
+                        continue;
+                    }
 
                     char ch;
                     if ((ch = (char) buffer.get(last)) != '\n') {
-                        buffer.clear();
-                        iterator.remove();
                         continue;
                     }
 
                     buffer.flip();
-                    String command = new String(buffer.array(), 0, buffer.limit()).trim();
+                    String line = new String(buffer.array(), 0, buffer.limit()).trim();
 
-                    System.out.println(command);
+                    System.out.println(channel.getRemoteAddress() + ":" + line);
 
-                    handleCommand(selector, channel, command);
+                    for (String command : line.split("\n")) {
+                        handleCommand(selector, channel, command);
+                    }
+
 
                     buffer.clear();
 
@@ -76,7 +77,7 @@ public class NioServer2 {
                     while (buffer.hasRemaining()) {
                         channel.write(buffer);
                     }
-                    next.interestOps(SelectionKey.OP_READ);
+//                    next.interestOps(SelectionKey.OP_READ);
 
                 } else if (next.isConnectable()) {
                     System.out.println("isConnectable");
@@ -92,40 +93,55 @@ public class NioServer2 {
         byte[] bytes = (line + "\n").getBytes();
         ByteBuffer writeBuffer = ByteBuffer.allocate(bytes.length);
         writeBuffer.put(bytes);
-        socketChannel.register(selector, SelectionKey.OP_WRITE, writeBuffer);
+
+        writeBuffer.flip();
+        socketChannel.write(writeBuffer);
+
+        writeBuffer = null;
+
+//        socketChannel.register(selector, SelectionKey.OP_WRITE, writeBuffer);
     }
 
     private static void handleCommand(Selector selector, SocketChannel channel, String command) throws Exception {
+        if (command == null || command.trim().equals("")) {
+            return;
+        }
+
         if ("quit".equals(command.trim())) {
+            System.out.println("do quit");
             channel.close();
         } else if (command.startsWith("set")) {
-            String[] split = command.split(" ");
-
-            if (split.length == 3) {
-                testMap.put(split[1], split[2]);
+            List<String> params = getParams(command, "set");
+            if (params.size() == 2) {
+                testMap.put(params.get(0), params.get(1));
             }
         } else if (command.startsWith("get")) {
-            String[] split = command.split(" ");
-            if (split.length == 2) {
-                String result = testMap.get(split[1]) + "";
+            List<String> params = getParams(command, "get");
+            if (params.size() == 1) {
+                String result = testMap.get(params.get(0)) + "";
                 System.out.println(result);
 
                 writeResponse(selector, channel, result);
-//                            writeBuffer.flip();
-//                            channel.write(writeBuffer);
             }
 
-        } else if (command.equals("keys *")) {
-            Set<String> keySet = testMap.keySet();
-            writeResponse(selector, channel, keySet.toString());
+        } else if (command.startsWith("keys")) {
+
+            List<String> params = getParams(command, "keys");
+            if (params.size() == 1) {
+                String pattern = params.get(0).replaceAll("\\*", ".*");
+                Set<String> keySet = testMap.keySet().stream()
+                        .filter(i -> i.matches(pattern)).collect(Collectors.toSet());
+                writeResponse(selector, channel, keySet.toString());
+            }
+
         } else if (command.startsWith("hset")) {
-            String[] split = command.split(" ");
 
-            if (split.length == 4) {
+            List<String> params = getParams(command, "hset");
+            if (params.size() == 3) {
 
-                String k = split[1];
-                String hashKey = split[2];
-                String value = split[3];
+                String k = params.get(0);
+                String hashKey = params.get(1);
+                String value = params.get(2);
 
                 Object o = testMap.get(k);
                 if (o == null) {
@@ -137,12 +153,12 @@ public class NioServer2 {
                 map.put(hashKey, value);
             }
         } else if (command.startsWith("hget")) {
-            String[] split = command.split(" ");
 
-            if (split.length == 3) {
+            List<String> params = getParams(command, "hget");
 
-                String k = split[1];
-                String hashKey = split[2];
+            if (params.size() == 2) {
+                String k = params.get(0);
+                String hashKey = params.get(1);
 
                 Object o = testMap.get(k);
                 Object res = null + "";
@@ -154,7 +170,22 @@ public class NioServer2 {
             }
         } else if (command.equals("flushdb")) {
             testMap.clear();
+        } else {
+            System.out.println("command=" + command);
         }
+    }
+
+    private static List<String> getParams(String command, String start) {
+        String[] split = command.split(" ");
+
+        List<String> params = new ArrayList<>();
+        for (String str : split) {
+            if (str != null && !str.trim().equals("") && !str.trim().equals(start)) {
+                params.add(str.trim());
+            }
+        }
+
+        return params;
     }
 
 }

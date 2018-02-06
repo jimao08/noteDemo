@@ -1,5 +1,6 @@
 package com.demo.NioDemo;
 
+import java.io.BufferedOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -12,7 +13,7 @@ public class NioClient {
         ExecutorService service = new ThreadPoolExecutor(10, 20, 2,
                 TimeUnit.MINUTES, new LinkedBlockingQueue<>(), Executors.defaultThreadFactory(), new ThreadPoolExecutor.DiscardOldestPolicy());
 
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10000; i++) {
 
             final int ival = i;
 
@@ -22,14 +23,14 @@ public class NioClient {
                     try {
 
                         Socket socket = new Socket("localhost", 8889);
-                        OutputStream os = socket.getOutputStream();
+                        OutputStream os = new BufferedOutputStream(socket.getOutputStream());
 
 //                        os.write(("hehe" + ival + "\n").getBytes());
                         os.write(("set " + "hehe" + ival + " " + "d" + "\n").getBytes());
-                        os.write("quit\n".getBytes());
-
                         os.flush();
 
+                        os.write("quit\n".getBytes());
+                        os.flush();
                         socket.close();
                     } catch (Exception ex) {
                         ex.printStackTrace();
