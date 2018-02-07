@@ -51,7 +51,7 @@ public class ThreadDemo5 {
         }
 
 
-        //为什么下面这种方式无效
+        //为什么下面这种方式无效-->非static方法，锁的是this，即当前的MapTask对象
 //        @Override
 //        public synchronized void run() {
 //            saveMap.put(ival, ival);
