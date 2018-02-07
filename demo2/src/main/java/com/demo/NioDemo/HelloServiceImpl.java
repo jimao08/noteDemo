@@ -16,4 +16,9 @@ public class HelloServiceImpl implements HelloService{
 
         return person.getFirstName() + ">" + person.getLastName();
     }
+
+    @Override
+    public Person find(String firstName) {
+        return new Person(firstName, "lastName");
+    }
 }

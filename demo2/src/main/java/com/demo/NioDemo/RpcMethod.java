@@ -1,6 +1,7 @@
 package com.demo.NioDemo;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class RpcMethod implements Serializable {
     private String serviceName;
@@ -35,5 +36,14 @@ public class RpcMethod implements Serializable {
 
     public void setParams(Object[] params) {
         this.params = params;
+    }
+
+    @Override
+    public String toString() {
+        return "RpcMethod{" +
+                "serviceName='" + serviceName + '\'' +
+                ", methodName='" + methodName + '\'' +
+                ", params=" + Arrays.toString(params) +
+                '}';
     }
 }

@@ -20,12 +20,26 @@ public class RpcServer0 {
         Selector selector = Selector.open();
         ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
 
-        serverSocketChannel.bind(new InetSocketAddress(8887));
+        InetSocketAddress address = new InetSocketAddress(8887);
+        serverSocketChannel.bind(address);
 
         serverSocketChannel.configureBlocking(false);
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
 
         System.out.println("rpc server start.");
+
+        RpcServerRegister0.register(address, HelloServiceImpl.class);
+        RpcServerRegister0.register(address, TestServiceImpl.class);
+
+        Thread hook = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                RpcServerRegister0.unregister(address, HelloServiceImpl.class);
+                RpcServerRegister0.unregister(address, TestServiceImpl.class);
+            }
+        });
+        hook.setDaemon(true);
+        Runtime.getRuntime().addShutdownHook(hook);
 
         while (true) {
 
@@ -49,29 +63,37 @@ public class RpcServer0 {
                     System.out.println("isAcceptable");
                 } else if (key.isReadable()) {
                     System.out.println("read");
+                    SocketChannel channel = null;
+                    try {
+                        channel = (SocketChannel) key.channel();
+                        ByteBuffer buffer = (ByteBuffer) key.attachment();
 
-                    SocketChannel channel = (SocketChannel) key.channel();
-                    ByteBuffer buffer = (ByteBuffer) key.attachment();
+                        if (!channel.isConnected() || !channel.isOpen()) {
+                            continue;
+                        }
 
-                    if (!channel.isOpen()) {
-                        continue;
+                        int read = channel.read(buffer);
+
+                        if (read == -1) {
+                            channel.close();
+                        }
+
+                        buffer.flip();
+                        System.out.println(new String(buffer.array(), 0, buffer.limit()));
+
+
+                        RpcMethod method = readMethod(buffer.array());
+                        Object o = invoke(method);
+                        sendMessage(channel, o);
+
+                        buffer.clear();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+
+                        if (channel != null && channel.isOpen()) {
+                            channel.close();
+                        }
                     }
-
-                    int read = channel.read(buffer);
-
-                    if (read == -1) {
-                        channel.close();
-                    }
-
-                    buffer.flip();
-                    System.out.println(new String(buffer.array(), 0, buffer.limit()));
-
-
-                    RpcMethod method = readMethod(buffer.array());
-                    Object o = invoke(method);
-                    sendMessage(channel, o);
-
-                    buffer.clear();
 
                 }
 
@@ -88,6 +110,7 @@ public class RpcServer0 {
         RpcMethod method = (RpcMethod) o;
 
         ois.close();
+        System.out.println("method=" + method);
         return method;
     }
 
@@ -112,41 +135,24 @@ public class RpcServer0 {
 
     private static Object invoke(RpcMethod method) throws Exception {
         String serviceName = method.getServiceName();
+        Class serviceClass = RpcServerRegister0.serviceClassMap.get(serviceName);
+        if (serviceClass == null) {
+            return null;
+        }
+
         Object[] params = method.getParams();
 
-        Class<?> aClass = Class.forName(serviceName);
-        Object obj = aClass.newInstance();
-
-        Method[] methods = aClass.getMethods();
-
-        Method find = null;
-        for (Method m : methods) {
-            if (m.getName().equals(method.getMethodName())
-                    && m.getParameterCount() == params.length) {
-
-                Class<?>[] parameterTypes = m.getParameterTypes();
-
-                boolean match = true;
-                for (int i = 0; i < parameterTypes.length; i++) {
-                    Class<?> type = parameterTypes[i];
-
-                    if (type != params[i].getClass()) {
-                        match = false;
-                        break;
-                    }
-
-                }
-
-                if (!match) {
-                    continue;
-                }
-
-                find = m;
-                break;
-            }
+        Class[] paramTypes = new Class[params.length];
+        for (int i = 0; i < params.length; i++) {
+            paramTypes[i] = params[i].getClass();
         }
-        if (find != null) {
-            Object invoke = find.invoke(obj, params);
+
+        Object obj = serviceClass.newInstance();
+
+        Method m = serviceClass.getMethod(method.getMethodName(), paramTypes);
+
+        if (m != null) {
+            Object invoke = m.invoke(obj, params);
             return invoke;
         }
 
