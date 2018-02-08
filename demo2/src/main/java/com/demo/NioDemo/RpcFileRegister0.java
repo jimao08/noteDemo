@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 使用文件来记录注册信息
+ */
 public class RpcFileRegister0 implements RpcRegister {
 
     private static final String FILE_PATH = "register";

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+
 public class RpcZookeeperRegister0 implements RpcRegister {
 
     private ZooKeeper zooKeeper;
@@ -87,7 +88,8 @@ public class RpcZookeeperRegister0 implements RpcRegister {
     }
 
     public void unregister(InetSocketAddress address,Class aClass) throws Exception {
-
+        //todo
+        System.out.println("unregister.");
     }
 
     private Stat exists(String path) throws Exception {
