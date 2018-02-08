@@ -37,7 +37,7 @@ public class RpcClient0 {
         }
 
         String serviceName = className.getSimpleName();
-        InetSocketAddress serverAdress = RpcServerRegister0.discover(serviceName);
+        InetSocketAddress serverAdress = RpcZookeeperRegister0.getInstance().discover(serviceName);
 
         if (serverAdress == null) {
             throw new Exception("no service " + serviceName);
@@ -65,11 +65,8 @@ public class RpcClient0 {
         RpcMethod rpcMethod = new RpcMethod(className.getSimpleName(),
                 method.getName(), param);
 
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(bos);
-        oos.writeObject(rpcMethod);
-
-        sendMessage(bos.toByteArray());
+        byte[] bytes = ObjectStreamUtils.getObjectBytes(rpcMethod);
+        sendMessage(bytes);
 
         return readMessage();
     }
@@ -87,11 +84,7 @@ public class RpcClient0 {
 
         int read = channel.read(buffer);
 
-        ByteArrayInputStream bis = new ByteArrayInputStream(buffer.array());
-        ObjectInputStream ois = new ObjectInputStream(bis);
-        Object o = ois.readObject();
-
-        ois.close();
+        Object o = ObjectStreamUtils.readObject(buffer.array());
         return o;
     }
 }

@@ -7,13 +7,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RpcServerRegister0 {
+public class RpcFileRegister0 implements RpcRegister {
 
+    private static final String FILE_PATH = "register";
     static Map<String, Class> serviceClassMap = new HashMap<>();
     private static Map<String, List<InetSocketAddress>> serviceAdressMap = new HashMap<>();
     private static Object lock = new Object();
 
-    public static void register(InetSocketAddress address, Class aClass) {
+    private static RpcFileRegister0 register;
+
+    private RpcFileRegister0() {
+    }
+
+    public static RpcFileRegister0 getInstance() {
+        if (register == null) {
+            register = new RpcFileRegister0();
+        }
+        return register;
+    }
+
+    public void register(InetSocketAddress address, Class aClass) {
         synchronized (lock) {
             readMaps();
 
@@ -33,7 +46,7 @@ public class RpcServerRegister0 {
         }
     }
 
-    public static InetSocketAddress discover(String serviceName) {
+    public InetSocketAddress discover(String serviceName) {
 
         try {
             readMaps();
@@ -64,7 +77,7 @@ public class RpcServerRegister0 {
 
     private static void updateMaps() {
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream("register");
+            FileOutputStream fileOutputStream = new FileOutputStream(FILE_PATH);
             ObjectOutputStream oos = new ObjectOutputStream(fileOutputStream);
             oos.writeObject(serviceClassMap);
             oos.writeObject(serviceAdressMap);
@@ -76,7 +89,7 @@ public class RpcServerRegister0 {
         }
     }
 
-    public static void unregister(InetSocketAddress address,Class aClass) {
+    public void unregister(InetSocketAddress address,Class aClass) {
         synchronized (lock) {
             readMaps();
             String serviceName = aClass.getInterfaces()[0].getSimpleName();
@@ -87,7 +100,6 @@ public class RpcServerRegister0 {
             }
 
             updateMaps();
-
             System.out.println("unregister server:" + address);
         }
     }

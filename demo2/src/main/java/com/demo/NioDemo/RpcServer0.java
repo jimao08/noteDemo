@@ -1,9 +1,5 @@
 package com.demo.NioDemo;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -28,14 +24,22 @@ public class RpcServer0 {
 
         System.out.println("rpc server start.");
 
-        RpcServerRegister0.register(address, HelloServiceImpl.class);
-        RpcServerRegister0.register(address, TestServiceImpl.class);
+        RpcRegister register = RpcZookeeperRegister0.getInstance();
+
+
+        register.register(address, HelloServiceImpl.class);
+        register.register(address, TestServiceImpl.class);
 
         Thread hook = new Thread(new Runnable() {
             @Override
             public void run() {
-                RpcServerRegister0.unregister(address, HelloServiceImpl.class);
-                RpcServerRegister0.unregister(address, TestServiceImpl.class);
+                try {
+                    register.unregister(address, HelloServiceImpl.class);
+                    register.unregister(address, TestServiceImpl.class);
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
         hook.setDaemon(true);
@@ -103,25 +107,14 @@ public class RpcServer0 {
     }
 
     private static RpcMethod readMethod(byte[] message) throws Exception {
-        ByteArrayInputStream bis = new ByteArrayInputStream(message);
-        ObjectInputStream ois = new ObjectInputStream(bis);
-        Object o = ois.readObject();
-
-        RpcMethod method = (RpcMethod) o;
-
-        ois.close();
+        RpcMethod method = (RpcMethod) ObjectStreamUtils.readObject(message);
         System.out.println("method=" + method);
         return method;
     }
 
     private static void sendMessage(SocketChannel channel, Object o) throws Exception {
         if (channel.isOpen()) {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
-
-            oos.writeObject(o);
-            oos.flush();
-            byte[] message = bos.toByteArray();
+            byte[] message = ObjectStreamUtils.getObjectBytes(o);
 
             ByteBuffer buffer = ByteBuffer.allocate(message.length);
 
@@ -129,13 +122,12 @@ public class RpcServer0 {
             buffer.flip();
             channel.write(buffer);
 
-            oos.close();
         }
     }
 
     private static Object invoke(RpcMethod method) throws Exception {
         String serviceName = method.getServiceName();
-        Class serviceClass = RpcServerRegister0.serviceClassMap.get(serviceName);
+        Class serviceClass = RpcFileRegister0.serviceClassMap.get(serviceName);
         if (serviceClass == null) {
             return null;
         }
