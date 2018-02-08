@@ -127,6 +127,8 @@ public class RpcServer0 {
 
     private static Object invoke(RpcMethod method) throws Exception {
         String serviceName = method.getServiceName();
+
+        //fixme
         Class serviceClass = RpcFileRegister0.serviceClassMap.get(serviceName);
         if (serviceClass == null) {
             return null;
