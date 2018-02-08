@@ -30,6 +30,13 @@ public interface RpcRegister {
      * @param aClass
      * @throws Exception
      */
-    void unregister(InetSocketAddress address,Class aClass) throws Exception ;
+    void unregister(InetSocketAddress address,Class aClass) throws Exception;
+
+
+    /**
+     *
+     * @throws Exception
+     */
+    void close() throws Exception;
 
 }

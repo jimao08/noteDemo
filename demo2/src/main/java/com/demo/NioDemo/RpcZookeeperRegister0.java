@@ -2,6 +2,8 @@ package com.demo.NioDemo;
 
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -10,6 +12,8 @@ import java.util.concurrent.CountDownLatch;
 
 
 public class RpcZookeeperRegister0 implements RpcRegister {
+
+    private static final Logger logger = LoggerFactory.getLogger(RpcZookeeperRegister0.class);
 
     private ZooKeeper zooKeeper;
 
@@ -20,6 +24,23 @@ public class RpcZookeeperRegister0 implements RpcRegister {
 
     private RpcZookeeperRegister0() throws Exception {
         init();
+    }
+
+    private void init() throws Exception {
+        System.out.println("register zookeeper init.");
+
+        CountDownLatch latch = new CountDownLatch(1);
+        zooKeeper = new ZooKeeper("localhost:2181", 900000, new Watcher() {
+
+            @Override
+            public void process(WatchedEvent event) {
+                if (event.getState() == Event.KeeperState.SyncConnected) {
+                    latch.countDown();
+                }
+            }
+        });
+        latch.await();
+        logger.info("zookeeper connected.");
     }
 
     public static RpcZookeeperRegister0 getInstance() throws Exception {
@@ -33,23 +54,6 @@ public class RpcZookeeperRegister0 implements RpcRegister {
         }
 
         return register;
-    }
-
-    private void init() throws Exception {
-        System.out.println("register zookeeper init");
-
-        CountDownLatch latch = new CountDownLatch(1);
-        zooKeeper = new ZooKeeper("localhost:2181", 900000, new Watcher() {
-
-            @Override
-            public void process(WatchedEvent event) {
-                if (event.getState() == Event.KeeperState.SyncConnected) {
-                    latch.countDown();
-                }
-            }
-        });
-        latch.await();
-        System.out.println("zookeeper connected.");
     }
 
     public synchronized void register(InetSocketAddress address, Class aClass) throws Exception {
@@ -66,6 +70,15 @@ public class RpcZookeeperRegister0 implements RpcRegister {
             byte[] data = getData(servicePath);
             Object o = ObjectStreamUtils.readObject(data);
             ArrayList<InetSocketAddress> addressList = (ArrayList<InetSocketAddress>) o;
+
+
+            for (InetSocketAddress a : addressList) {
+                if (a.getPort() == address.getPort() && a.getHostString().equals(address.getHostString())) {
+                    logger.info("is samme server:" + a);
+                    return;
+                }
+            }
+
             addressList.add(address);
             setNodeData(servicePath, ObjectStreamUtils.getObjectBytes(addressList), stat.getVersion());
         }
@@ -103,6 +116,14 @@ public class RpcZookeeperRegister0 implements RpcRegister {
         return exists;
     }
 
+    @Override
+    public void close() throws Exception {
+        if (zooKeeper != null) {
+            zooKeeper.close();
+        }
+        register = null;
+    }
+
     private void addNode(String path, byte[] data) throws Exception {
         zooKeeper.create(path, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
     }
@@ -130,5 +151,4 @@ public class RpcZookeeperRegister0 implements RpcRegister {
 
         return childrens;
     }
-
 }

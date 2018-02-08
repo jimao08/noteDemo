@@ -7,10 +7,13 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
 public class RpcServer0 {
+
+    private static HashMap<String,Class> serviceClassMap = new HashMap();
 
     public static void main(String[] args) throws Exception {
         Selector selector = Selector.open();
@@ -28,7 +31,10 @@ public class RpcServer0 {
 
 
         register.register(address, HelloServiceImpl.class);
+        serviceClassMap.put(HelloServiceImpl.class.getInterfaces()[0].getSimpleName(), HelloServiceImpl.class);
+
         register.register(address, TestServiceImpl.class);
+        serviceClassMap.put(TestServiceImpl.class.getInterfaces()[0].getSimpleName(), TestServiceImpl.class);
 
         Thread hook = new Thread(new Runnable() {
             @Override
@@ -128,8 +134,7 @@ public class RpcServer0 {
     private static Object invoke(RpcMethod method) throws Exception {
         String serviceName = method.getServiceName();
 
-        //fixme
-        Class serviceClass = RpcFileRegister0.serviceClassMap.get(serviceName);
+        Class serviceClass = serviceClassMap.get(serviceName);
         if (serviceClass == null) {
             return null;
         }

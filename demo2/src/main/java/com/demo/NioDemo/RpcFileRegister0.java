@@ -13,7 +13,6 @@ import java.util.Map;
 public class RpcFileRegister0 implements RpcRegister {
 
     private static final String FILE_PATH = "register";
-    static Map<String, Class> serviceClassMap = new HashMap<>();
     private static Map<String, List<InetSocketAddress>> serviceAdressMap = new HashMap<>();
     private static Object lock = new Object();
 
@@ -34,7 +33,6 @@ public class RpcFileRegister0 implements RpcRegister {
             readMaps();
 
             String serviceName = aClass.getInterfaces()[0].getSimpleName();
-            serviceClassMap.put(serviceName, aClass);
 
             List<InetSocketAddress> addressList = serviceAdressMap.get(serviceName);
             if (addressList == null) {
@@ -60,6 +58,12 @@ public class RpcFileRegister0 implements RpcRegister {
         return null;
     }
 
+    @Override
+    public void close() throws Exception {
+        register = null;
+        serviceAdressMap = null;
+    }
+
     private static void readMaps() {
         try {
             File file = new File("register");
@@ -69,7 +73,6 @@ public class RpcFileRegister0 implements RpcRegister {
 
             FileInputStream fileInputStream = new FileInputStream(file);
             ObjectInputStream ois = new ObjectInputStream(fileInputStream);
-            serviceClassMap = (Map<String, Class>) ois.readObject();
             serviceAdressMap = (HashMap<String, List<InetSocketAddress>>) ois.readObject();
 
             fileInputStream.close();
@@ -82,7 +85,6 @@ public class RpcFileRegister0 implements RpcRegister {
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(FILE_PATH);
             ObjectOutputStream oos = new ObjectOutputStream(fileOutputStream);
-            oos.writeObject(serviceClassMap);
             oos.writeObject(serviceAdressMap);
 
             fileOutputStream.close();
@@ -106,4 +108,5 @@ public class RpcFileRegister0 implements RpcRegister {
             System.out.println("unregister server:" + address);
         }
     }
+
 }

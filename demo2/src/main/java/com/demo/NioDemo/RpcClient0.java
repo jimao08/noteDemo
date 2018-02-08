@@ -28,6 +28,7 @@ public class RpcClient0 {
     public void close() throws Exception {
         if (channel.isOpen()) {
             channel.close();
+            RpcZookeeperRegister0.getInstance().close();
         }
     }
 
