@@ -7,6 +7,8 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
+
+//todo 线程安全
 public class RpcClient0 {
 
     private static SocketChannel channel;
@@ -38,6 +40,8 @@ public class RpcClient0 {
         }
 
         String serviceName = className.getSimpleName();
+
+        //todo 重试
         InetSocketAddress serverAdress = RpcZookeeperRegister0.getInstance().discover(serviceName);
 
         if (serverAdress == null) {
@@ -81,6 +85,7 @@ public class RpcClient0 {
     }
 
     private Object readMessage() throws Exception {
+        //todo
         ByteBuffer buffer = ByteBuffer.allocate(1024);
 
         int read = channel.read(buffer);

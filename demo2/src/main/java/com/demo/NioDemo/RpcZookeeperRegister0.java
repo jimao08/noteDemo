@@ -60,27 +60,34 @@ public class RpcZookeeperRegister0 implements RpcRegister {
         String serviceName = aClass.getInterfaces()[0].getSimpleName();
         String servicePath = MY_SERVER_PATH + "/" + serviceName;
 
-        Stat stat = exists(servicePath);
+        while (true) {
+            try {
+                Stat stat = exists(servicePath);
+                if (stat == null) {
+                    ArrayList<InetSocketAddress> list = new ArrayList<>();
+                    list.add(address);
+                    addNode(servicePath, ObjectStreamUtils.getObjectBytes(list));
+                    return;
+                } else {
+                    byte[] data = getData(servicePath);
+                    Object o = ObjectStreamUtils.readObject(data);
+                    ArrayList<InetSocketAddress> addressList = (ArrayList<InetSocketAddress>) o;
 
-        if (stat == null) {
-            ArrayList<InetSocketAddress> list = new ArrayList<>();
-            list.add(address);
-            addNode(servicePath, ObjectStreamUtils.getObjectBytes(list));
-        } else {
-            byte[] data = getData(servicePath);
-            Object o = ObjectStreamUtils.readObject(data);
-            ArrayList<InetSocketAddress> addressList = (ArrayList<InetSocketAddress>) o;
 
+                    for (InetSocketAddress a : addressList) {
+                        if (a.getPort() == address.getPort() && a.getHostString().equals(address.getHostString())) {
+                            logger.info("is samme server:" + a);
+                            return;
+                        }
+                    }
 
-            for (InetSocketAddress a : addressList) {
-                if (a.getPort() == address.getPort() && a.getHostString().equals(address.getHostString())) {
-                    logger.info("is samme server:" + a);
+                    addressList.add(address);
+                    setNodeData(servicePath, ObjectStreamUtils.getObjectBytes(addressList), stat.getVersion());
                     return;
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            addressList.add(address);
-            setNodeData(servicePath, ObjectStreamUtils.getObjectBytes(addressList), stat.getVersion());
         }
     }
 
