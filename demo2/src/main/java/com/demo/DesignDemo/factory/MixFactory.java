@@ -1,4 +1,4 @@
-package com.demo.DesignDemo;
+package com.demo.DesignDemo.factory;
 
 /**
  * 抽象工厂具体类

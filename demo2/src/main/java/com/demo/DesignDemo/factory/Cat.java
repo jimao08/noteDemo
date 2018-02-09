@@ -1,4 +1,4 @@
-package com.demo.DesignDemo;
+package com.demo.DesignDemo.factory;
 
 public class Cat implements Animal {
     @Override

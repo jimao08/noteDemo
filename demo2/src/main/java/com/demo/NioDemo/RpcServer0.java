@@ -36,6 +36,7 @@ public class RpcServer0 {
         register.register(address, TestServiceImpl.class);
         serviceClassMap.put(TestServiceImpl.class.getInterfaces()[0].getSimpleName(), TestServiceImpl.class);
 
+        //todo 如何注销
         Thread hook = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -92,6 +93,7 @@ public class RpcServer0 {
                         System.out.println(new String(buffer.array(), 0, buffer.limit()));
 
 
+                        //todo 长度超过1024怎么办
                         RpcMethod method = readMethod(buffer.array());
                         Object o = invoke(method);
                         sendMessage(channel, o);

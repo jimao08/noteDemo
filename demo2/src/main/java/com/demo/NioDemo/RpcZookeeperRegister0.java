@@ -94,6 +94,8 @@ public class RpcZookeeperRegister0 implements RpcRegister {
             ArrayList<InetSocketAddress> addressList = (ArrayList<InetSocketAddress>) o;
 
             System.out.println(addressList);
+
+            //todo 如何做负载均衡
             return addressList.get(0);
         }
 
