@@ -7,12 +7,12 @@ package com.demo.DesignDemo.factory;
 public class MixFactoryImpl implements MixFactory{
 
     @Override
-    public Animal getAnimal() {
+    public Animal getAnimal(String type) {
         return new Cat();
     }
 
     @Override
-    public Car getCar() {
+    public Car getCar(String type) {
         return new FastCar();
     }
 }
