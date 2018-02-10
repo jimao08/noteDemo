@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -67,8 +68,10 @@ public class RpcZookeeperRegister0 implements RpcRegister {
                     ArrayList<InetSocketAddress> list = new ArrayList<>();
                     list.add(address);
                     addNode(servicePath, ObjectStreamUtils.getObjectBytes(list));
+                    System.out.println("add server:" + address);
                     return;
                 } else {
+                    int version = stat.getVersion();
                     byte[] data = getData(servicePath);
                     Object o = ObjectStreamUtils.readObject(data);
                     ArrayList<InetSocketAddress> addressList = (ArrayList<InetSocketAddress>) o;
@@ -82,7 +85,8 @@ public class RpcZookeeperRegister0 implements RpcRegister {
                     }
 
                     addressList.add(address);
-                    setNodeData(servicePath, ObjectStreamUtils.getObjectBytes(addressList), stat.getVersion());
+                    setNodeData(servicePath, ObjectStreamUtils.getObjectBytes(addressList), version);
+                    System.out.println("add server:" + address);
                     return;
                 }
             } catch (Exception e) {
@@ -98,20 +102,57 @@ public class RpcZookeeperRegister0 implements RpcRegister {
 
         if (exists != null) {
             Object o = ObjectStreamUtils.readObject(getData(servicePath));
-            ArrayList<InetSocketAddress> addressList = (ArrayList<InetSocketAddress>) o;
 
-            System.out.println(addressList);
-
-            //todo 如何做负载均衡
-            return addressList.get(0);
+            if (o != null) {
+                ArrayList<InetSocketAddress> addressList = (ArrayList<InetSocketAddress>) o;
+                System.out.println(addressList);
+                //todo 如何做负载均衡
+                if (addressList.size() > 0) {
+                    return addressList.get(0);
+                }
+            }
         }
 
         return null;
     }
 
-    public void unregister(InetSocketAddress address,Class aClass) throws Exception {
-        //todo
-        System.out.println("unregister.");
+
+    public synchronized void unregister(InetSocketAddress address, Class aClass) throws Exception {
+        String serviceName = getServiceName(aClass);
+        String servicePath = MY_SERVER_PATH + "/" + serviceName;
+
+
+        while (true) {
+            try {
+                Stat exists = exists(servicePath);
+                if (exists == null) {
+                    return;
+                }
+
+                int version = exists.getVersion();
+
+                byte[] data = getData(servicePath);
+                Object o = ObjectStreamUtils.readObject(data);
+                ArrayList<InetSocketAddress> addressList = (ArrayList<InetSocketAddress>) o;
+
+                Iterator<InetSocketAddress> iterator = addressList.iterator();
+
+                while (iterator.hasNext()) {
+                    InetSocketAddress next = iterator.next();
+
+                    if (next.getHostString().equals(address.getHostString())
+                            && next.getPort() == address.getPort()) {
+                        System.out.println("unregister server:" + address);
+                        iterator.remove();
+                        break;
+                    }
+                }
+                setNodeData(servicePath, ObjectStreamUtils.getObjectBytes(addressList), version);
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private Stat exists(String path) throws Exception {
@@ -159,5 +200,10 @@ public class RpcZookeeperRegister0 implements RpcRegister {
         });
 
         return childrens;
+    }
+
+    private String getServiceName(Class cls) {
+        String serviceName = cls.getInterfaces()[0].getSimpleName();
+        return serviceName;
     }
 }
