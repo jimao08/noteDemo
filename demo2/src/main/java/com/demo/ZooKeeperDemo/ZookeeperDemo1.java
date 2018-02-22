@@ -47,6 +47,11 @@ public class ZookeeperDemo1 {
                 zooKeeper.create("/b", "1234".getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
             }
 
+            Stat stat = new Stat();
+            byte[] data = zooKeeper.getData("/b", true, stat);
+
+            System.out.println(new String(data));
+
             run.await();
         } catch (IOException e) {
             e.printStackTrace();
