@@ -2,6 +2,8 @@ package com.demo.ZooKeeperDemo;
 
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
+import org.apache.zookeeper.server.LogFormatter;
+import org.apache.zookeeper.server.SnapshotFormatter;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -31,6 +33,8 @@ public class ZookeeperDemo2 {
 
             if (exists == null) {
                 zooKeeper.create("/b", "1234".getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+            } else {
+                zooKeeper.setData("/b", "ddd".getBytes(), exists.getVersion());
             }
 
 
@@ -47,6 +51,9 @@ public class ZookeeperDemo2 {
                     System.out.println("code=" + rc);
                 }
             }, ctx);
+
+
+//            SnapshotFormatter.main(new String[]{"C:\\tmp\\zookeeper3\\version-2\\snapshot.100000000"});
 
             run.await();
         } catch (Exception e) {
