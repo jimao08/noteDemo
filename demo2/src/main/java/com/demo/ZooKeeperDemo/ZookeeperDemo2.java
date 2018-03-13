@@ -26,34 +26,11 @@ public class ZookeeperDemo2 {
                 }
             });
             latch.await();
+
             System.out.println("zk connected.");
 
 
-            Stat exists = zooKeeper.exists("/b", null);
-
-            if (exists == null) {
-                zooKeeper.create("/b", "1234".getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-            } else {
-                zooKeeper.setData("/b", "ddd".getBytes(), exists.getVersion());
-            }
-
-
-            //async
-            Object ctx = new Object();
-            zooKeeper.exists("/aaa", new Watcher() {
-                @Override
-                public void process(WatchedEvent event) {
-
-                }
-            }, new AsyncCallback.StatCallback() {
-                @Override
-                public void processResult(int rc, String path, Object ctx, Stat stat) {
-                    System.out.println("code=" + rc);
-                }
-            }, ctx);
-
-
-//            SnapshotFormatter.main(new String[]{"C:\\tmp\\zookeeper3\\version-2\\snapshot.100000000"});
+            zooKeeper.create("/aaa", "1234".getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
 
             run.await();
         } catch (Exception e) {
