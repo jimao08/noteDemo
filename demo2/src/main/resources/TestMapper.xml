@@ -5,8 +5,22 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="testMapper">
 
-    <select id="findAll"  resultType="hashmap">
-        SELECT * FROM dmp_user
+    <resultMap id="userMap" type="com.demo.OrmDemo.OrmUser">
+        <id property="uid" column="id" javaType="java.lang.Integer"></id>
+        <result property="username" column="username" javaType="java.lang.String"></result>
+        <result property="password" column="password" javaType="java.lang.String"></result>
+    </resultMap>
+
+    <select id="findAll" resultMap="userMap">
+        SELECT * FROM test.dmp_user
+    </select>
+
+    <select id="findById" resultMap="userMap" parameterType="int">
+        SELECT * FROM test.dmp_user WHERE id=#{uid}
+    </select>
+
+    <select id="findByDate" parameterType="int" resultType="hashmap">
+        SELECT * FROM test.dmp_user WHERE id=#{uid}
     </select>
 
 </mapper>

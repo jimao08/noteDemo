@@ -22,10 +22,17 @@ public class OrmDemo1 {
 
         List<Object> list = sqlSession.selectList("testMapper.findAll");
 
-        for (Object s : list) {
-            System.out.println(s);
-        }
+//        List<Object> list2 = sqlSession.selectList("testMapper.findById",null);
+
+        OrmUser query = new OrmUser();
+        query.setUid(1);
+
+        OrmUser ormUser = (OrmUser) sqlSession.selectOne("testMapper.findById", query);
+
+        System.out.println(ormUser);
 
 
+
+        sqlSession.close();
     }
 }
