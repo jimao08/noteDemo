@@ -1,5 +1,6 @@
 package com.demo.Controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,10 +18,14 @@ import java.util.Map;
 @RequestMapping(value = "test")
 public class MyController {
 
+    @Autowired
+    private MyService myService;
+
     @RequestMapping(value = "dd", produces = MediaType.APPLICATION_JSON_UTF8_VALUE,method = RequestMethod.GET)
     public Object mm() {
         Map map = new HashMap();
         map.put("msg", "ss");
+        myService.print();
         return map;
     }
 
